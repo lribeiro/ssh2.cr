@@ -16,14 +16,25 @@ class SSH2::Session
     new(socket)
   end
 
-  def self.open(host, port = 22)
-    TCPSocket.open(host, port) do |socket|
-      session = new(socket)
+  def self.run(socket)
+    session = new(socket)
       begin
         yield session
       ensure
         session.disconnect
       end
+    end 
+  end
+
+  def self.open(host, port = 22, dns_timeout = nil, connect_timeout = nil)
+    TCPSocket.open(host, port, dns_timeout, connect_timeout) do |socket|
+      run(socket)
+    end
+  end
+
+  def self.open(host, port = 22)
+    TCPSocket.open(host, port) do |socket|
+      run(socket)
     end
   end
 
